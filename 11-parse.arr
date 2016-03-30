@@ -22,31 +22,28 @@ end
 
 fun parse(s :: S.S-Exp) -> Expr:
   cases (S.S-Exp) s:
+    | s-num(n) => e-num(n)
     | s-list(exps) =>
       cases (List<S.S-Exp>) exps:
-        | empty => raise("Not a valid statement in Paret")
         | link(first, rest) =>
           cases (S.S-Exp) first:
             | s-sym(op) =>
               if op == "+":
-                if rest.length() <> 2:
-                  raise("+ needs 2 operands")
-                else:
+                if rest.length() == 2:
                   e-op(op-plus, parse(rest.first), parse(rest.last()))
+                else:
+                  raise("Not a valid expression")
                 end
-                
               else:
-                raise(first + " not a valid operator")
+                raise("Not a valid expression")
               end
-            | else => raise("Should start with a valid operator")
+            | else => raise("Not a valid expression")
           end
+        | empty => raise("Not a valid expression")
       end
-    | s-num(n) => e-num(n)
-    | s-str(shadow s) => raise("Strings not accepted in Paret. Sorry!")
-    | s-sym(shadow s) => raise("Not a valid statement in Paret")
+    | else => raise("Not a valid expression")
   end
 end
-
 
 check:
   parse(S.s-num(3)) is e-num(3)
